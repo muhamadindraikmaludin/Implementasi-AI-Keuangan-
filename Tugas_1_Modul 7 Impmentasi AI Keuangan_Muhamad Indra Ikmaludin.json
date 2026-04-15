@@ -1,0 +1,215 @@
+{
+  "name": "Tugas_1_Modul 7 Impmentasi AI Keuangan_Muhamad Indra Ikmaludin",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Invoice Otomatis Inovazi",
+        "formDescription": "Silakan isi data untuk pembuatan tagihan",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Nama ",
+              "placeholder": "nama"
+            },
+            {
+              "fieldLabel": "Jam Kerja",
+              "fieldType": "number",
+              "placeholder": "waktu"
+            },
+            {
+              "fieldLabel": "Rate ",
+              "placeholder": "=100.000"
+            },
+            {
+              "fieldLabel": "Email Anda",
+              "placeholder": "email kamu"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "707d6c8c-c8b9-4543-91d1-e07db5182599",
+      "name": "On form submission",
+      "webhookId": "d331900c-7f72-425e-b544-c8c443487917"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5f0206bd-5074-4dbb-bf33-793c96504633",
+              "name": "=Total Biaya",
+              "value": "={{ (Number($('On form submission').item.json['Jam Kerja']) * Number($('On form submission').item.json['Rate '].toString().replace(/\\./g, \"\"))).toLocaleString('id-ID') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "fe0de585-9ed1-4ea5-bc5e-82e970cae508",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n\n<html lang=\"id\">\n<head>\n<meta charset=\"UTF-8\">\n<title>Invoice</title>\n<style>\nbody {\nfont-family: 'Segoe UI', Arial, sans-serif;\nbackground: #f4f6f8;\npadding: 40px;\ncolor: #333;\n}\n\n.invoice-wrapper {\n  max-width: 800px;\n  margin: auto;\n  background: #ffffff;\n  border-radius: 12px;\n  padding: 40px;\n  box-shadow: 0 8px 24px rgba(0,0,0,0.1);\n}\n\n.invoice-header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  border-bottom: 2px solid #eaeaea;\n  padding-bottom: 20px;\n  margin-bottom: 30px;\n}\n\n.invoice-header h1 {\n  margin: 0;\n  font-size: 32px;\n  color: #2d6a4f;\n  letter-spacing: 1px;\n}\n\n.invoice-meta {\n  text-align: right;\n  font-size: 14px;\n  color: #666;\n}\n\n.section {\n  margin-bottom: 30px;\n}\n\n.section-title {\n  font-size: 14px;\n  font-weight: bold;\n  color: #2d6a4f;\n  text-transform: uppercase;\n  margin-bottom: 10px;\n  border-bottom: 1px solid #eee;\n  padding-bottom: 5px;\n}\n\n.client-info p {\n  margin: 4px 0;\n  font-size: 15px;\n}\n\ntable {\n  width: 100%;\n  border-collapse: collapse;\n  margin-top: 15px;\n}\n\ntable thead th {\n  background: #f8f9fa;\n  border-bottom: 2px solid #2d6a4f;\n  padding: 12px;\n  text-align: left;\n  font-size: 14px;\n  color: #2d6a4f;\n}\n\ntable tbody td {\n  padding: 15px 12px;\n  border-bottom: 1px solid #eee;\n  font-size: 14px;\n}\n\n.text-right {\n  text-align: right;\n}\n\n.total-box {\n  margin-top: 30px;\n  display: flex;\n  justify-content: flex-end;\n}\n\n.total-box table {\n  width: 320px;\n}\n\n.total-box td {\n  padding: 10px;\n  font-size: 16px;\n}\n\n.total-row td {\n  font-weight: bold;\n  font-size: 20px;\n  color: #2d6a4f;\n  border-top: 2px solid #2d6a4f;\n  padding-top: 15px;\n}\n\n.footer {\n  margin-top: 50px;\n  font-size: 13px;\n  color: #999;\n  text-align: center;\n  border-top: 1px solid #eee;\n  padding-top: 20px;\n}\n\n\n</style>\n</head>\n\n<body>\n<div class=\"invoice-wrapper\">\n\n<!-- HEADER -->\n<div class=\"invoice-header\">\n  <h1>INVOICE</h1>\n  <div class=\"invoice-meta\">\n    <div>Tanggal: {{ $now.format('dd MMMM yyyy') }}</div>\n    <div>ID Eksekusi: #{{ $execution.id }}</div>\n  </div>\n</div>\n\n<!-- CLIENT INFO -->\n<div class=\"section client-info\">\n  <div class=\"section-title\">Ditagihkan Kepada</div>\n  <p><strong>{{ $('On form submission').item.json['Nama Klien'] }}</strong></p>\n  <p>{{ $('On form submission').item.json['Email Klien'] }}</p>\n</div>\n\n<!-- DETAIL TABLE -->\n<div class=\"section\">\n  <div class=\"section-title\">Detail Pekerjaan</div>\n\n  <table>\n    <thead>\n      <tr>\n        <th>Deskripsi</th>\n        <th class=\"text-right\">Jam</th>\n        <th class=\"text-right\">Rate</th>\n        <th class=\"text-right\">Subtotal</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr>\n        <td>Jasa Pekerjaan / Konsultasi (Healing Session)</td>\n        <td class=\"text-right\">{{ $('On form submission').item.json['Jam Kerja'] }}</td>\n        <td class=\"text-right\">Rp {{ $('Edit Fields').item.json['Rate '] }}</td>\n        <td class=\"text-right\">Rp {{ $json['Total Biaya'] }}</td>\n      </tr>\n    </tbody>\n  </table>\n</div>\n\n<!-- TOTAL -->\n<div class=\"total-box\">\n  <table>\n    <tr class=\"total-row\">\n      <td>Total Tagihan</td>\n      <td class=\"text-right\">Rp {{ $json['Total Biaya'] }}</td>\n    </tr>\n  </table>\n</div>\n\n<!-- FOOTER -->\n<div class=\"footer\">\n  Laporan ini digenerate secara otomatis oleh sistem Kaffe Tropikal Healing.<br>\n  Terima kasih atas kerja sama Anda.\n</div>\n\n\n</div>\n</body>\n</html>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "f577f58e-be67-4e47-afd0-e745ac23ef05",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "html_content": "={{ $json.html }}"
+      },
+      "type": "n8n-nodes-htmlcsstopdf.htmlcsstopdf",
+      "typeVersion": 1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "634c3346-eac2-425c-8be0-9c92f91ee389",
+      "name": "Convert HTML to PDF",
+      "credentials": {
+        "htmlcsstopdfApi": {
+          "id": "EtEdCKpDfaCuoNmP",
+          "name": "HTML to PDF account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.pdf_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        832,
+        0
+      ],
+      "id": "b02e6db1-0097-4ce5-aa10-94b290917d89",
+      "name": "HTTP Request",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "notesInFlow": false,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json['Email Klien'] }}",
+        "subject": "=Invoice Penagihan - {{ $('On form submission').item.json['Nama Klien'] }}",
+        "message": "=<p>Yth. <strong>{{ $('On form submission').item.json['Nama Klien'] }}</strong>,</p>\n\n<p>Terima kasih atas kepercayaan Anda telah menggunakan jasa kami.\n<br>\nBersama email ini, kami lampirkan invoice untuk pekerjaan yang telah diselesaikan.</p>\n\n<p>Berikut adalah ringkasan singkat tagihan Anda:</p>\n<ul>\n    <li><strong>Total Jam Kerja:</strong>  {{ $('On form submission').item.json['Jam Kerja'] }}jam</li>\n    <li><strong>Total Tagihan:</strong> {{ $('Edit Fields').item.json['Total Biaya'] }}</li>\n    <li><strong>Jatuh Tempo:</strong> 14 hari</li>\n</ul>\n\n<p>Detail lengkap, termasuk rincian pekerjaan dan instruksi pembayaran, dapat Anda temukan pada file PDF yang terlampir:{{ $json.pdf_url }}</p>\n\n<blockquote style=\"border-left: 4px solid #ccc; padding-left: 15px; margin-left: 0; font-style: italic;\">\n  <strong>Catatan Keamanan:</strong> Untuk melindungi Anda, kami tidak akan pernah meminta informasi password atau data sensitif melalui email. Harap lakukan pembayaran hanya ke nomor rekening resmi yang tertera di dalam invoice PDF.\n</blockquote>\n\n<p>Jika ada pertanyaan lebih lanjut, jangan ragu untuk membalas email ini.</p>\n\n<p>Hormat kami,</p>\n\n<p><strong>[Zen / Vedara Company]</strong><br>\n[Vedara / 123456789]</p>\n\n",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "04e0d8b1-2c0d-45d1-8db6-a95b6e1907e2",
+      "name": "Send a message",
+      "webhookId": "5ea0a297-27a9-496c-bd78-bbe1c6f9a590",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "eyqvVTCCXnrjsKRn",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Convert HTML to PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert HTML to PDF": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5f80036a-4910-4678-beb4-c21774ca7a68",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0adcf940c15f27c3b96f3bd4c5c640db86e15006f716c809e8f87ae00db62d2e"
+  },
+  "id": "n0Ei3WwF635uysDk",
+  "tags": []
+}
